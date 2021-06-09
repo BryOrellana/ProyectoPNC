@@ -7,6 +7,39 @@ namespace Biblioteca.Datos
 {
     public class DUsuario
     {
+        public string Usuario_Existe(string usuario)
+        {
+            string Rpta = "";
+            SqlConnection con = new SqlConnection();
+
+            try
+            {
+                con = Conexion.getInstancia().CrearConexion();
+                SqlCommand Comando = new SqlCommand("USUARIO_EXISTE", con);
+                Comando.CommandType = CommandType.StoredProcedure;
+                Comando.Parameters.Add("@usuario", SqlDbType.VarChar).Value = usuario;
+                SqlParameter ParExiste = new SqlParameter();
+                ParExiste.ParameterName = "@Existe";
+                ParExiste.SqlDbType = SqlDbType.Int;
+                ParExiste.Direction = ParameterDirection.Output;
+                Comando.Parameters.Add(ParExiste);
+
+                con.Open();
+                Comando.ExecuteNonQuery();
+                Rpta = Convert.ToString(ParExiste.Value);
+            }
+            catch (Exception ex)
+            {
+                Rpta = ex.Message;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open) con.Close();
+            }
+
+            return Rpta;
+        }
+
         public DataTable listar()
         {
             SqlDataReader result;

@@ -7,6 +7,39 @@ namespace Biblioteca.Datos
 {
     public class DRol
     {
+        public string Rol_Existe(string nombreRol)
+        {
+            string Rpta = "";
+            SqlConnection con = new SqlConnection();
+
+            try
+            {
+                con = Conexion.getInstancia().CrearConexion();
+                SqlCommand Comando = new SqlCommand("ROL_EXISTE", con);
+                Comando.CommandType = CommandType.StoredProcedure;
+                Comando.Parameters.Add("@nombreRol", SqlDbType.VarChar).Value = nombreRol;
+                SqlParameter ParExiste = new SqlParameter();
+                ParExiste.ParameterName = "@Existe";
+                ParExiste.SqlDbType = SqlDbType.Int;
+                ParExiste.Direction = ParameterDirection.Output;
+                Comando.Parameters.Add(ParExiste);
+
+                con.Open();
+                Comando.ExecuteNonQuery();
+                Rpta = Convert.ToString(ParExiste.Value);
+            }
+            catch (Exception ex)
+            {
+                Rpta = ex.Message;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open) con.Close();
+            }
+
+            return Rpta;
+        }
+
         public DataTable listar()
         {
             SqlDataReader result;
